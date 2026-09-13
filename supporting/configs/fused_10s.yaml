@@ -1,0 +1,47 @@
+# Phone sensor-fusion experiment using ten-second windows.
+# This differs from `fused.yaml` only in window duration, minimum sample count,
+# and output identity/path, allowing a controlled 5 s versus 10 s comparison.
+# At the expected 20 Hz, 150 samples retain reasonably complete 10 s windows.
+
+# Reproducibility identity shared by subject splitting and Random Forest.
+project:
+  name: har-spark-cloud-fused-10s
+  seed: 42
+
+# Local Spark resources for preprocessing and both model fits.
+spark:
+  app_name: WISDM-HAR-Fused-10s
+  master: "local[6]"
+  shuffle_partitions: 8
+  driver_memory: "4g"
+
+# Both phone sensors are aggregated separately and fused on common windows.
+data:
+  raw_glob: "data/raw/wisdm-dataset/raw/phone/*/*.txt"
+  device: phone
+  sensors: [accel, gyro]
+  window_seconds: 10
+  minimum_samples_per_window: 150
+  expected_sampling_hz: 20
+  processed_path: "data/processed/phone_accel_gyro_10s.parquet"
+
+# Fractions apply to deterministic whole-participant assignments.
+split:
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+
+# Fixed model settings keep this experiment comparable with the other runs.
+models:
+  logistic_regression:
+    max_iter: 80
+    reg_param: 0.05
+    elastic_net_param: 0.0
+  random_forest:
+    num_trees: 80
+    max_depth: 12
+    feature_subset_strategy: sqrt
+
+# Each run is written to a new timestamped directory.
+output:
+  results_root: results

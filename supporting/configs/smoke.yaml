@@ -1,0 +1,48 @@
+# Fast development smoke configuration—not a report-quality experiment.
+# It reads one phone-accelerometer file, uses two local Spark workers, and trains
+# deliberately tiny models.  Outputs live under `/tmp` so a quick wiring check
+# cannot be mistaken for or overwrite the full measured runs under `results/`.
+
+# The seed still makes the reduced pipeline deterministic where possible.
+project:
+  name: har-spark-cloud-smoke
+  seed: 42
+
+# Minimal local resources chosen for a short functional check.
+spark:
+  app_name: WISDM-HAR-Smoke
+  master: "local[2]"
+  shuffle_partitions: 2
+  driver_memory: "2g"
+
+# One source file and one sensor exercise parsing/windowing without fusion.
+data:
+  raw_glob: "data/raw/wisdm-dataset/raw/phone/accel/data_1600_accel_phone.txt"
+  device: phone
+  sensor: accel
+  window_seconds: 5
+  minimum_samples_per_window: 70
+  expected_sampling_hz: 20
+  processed_path: "/tmp/har-spark-smoke-features.parquet"
+
+# The normal participant policy is retained, although a tiny source may lack
+# enough participants for every split and therefore is not an accuracy benchmark.
+split:
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+
+# Reduced iterations/tree size minimise smoke-test latency.
+models:
+  logistic_regression:
+    max_iter: 5
+    reg_param: 0.05
+    elastic_net_param: 0.0
+  random_forest:
+    num_trees: 3
+    max_depth: 3
+    feature_subset_strategy: sqrt
+
+# Temporary output keeps development artifacts separate from evidence.
+output:
+  results_root: /tmp/har-spark-smoke-results

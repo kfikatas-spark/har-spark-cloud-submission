@@ -1,0 +1,16 @@
+{
+  "activities": 18,
+  "feature_windows": 32663,
+  "prepared_feature_path": "data/processed/phone_accel_5s_balanced.parquet",
+  "split_subjects": {
+    "test": 8,
+    "train": 35,
+    "validation": 8
+  },
+  "split_windows": {
+    "test": 5178,
+    "train": 22409,
+    "validation": 5076
+  },
+  "subjects": 51
+}

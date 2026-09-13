@@ -1,0 +1,791 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 3370" width="1800" height="3370" style="max-width:100%;height:auto;display:block;margin:auto;background:#08111f" lang="el" xml:lang="el" role="img" aria-labelledby="svg-title svg-desc">
+<title id="svg-title">Αναγνώριση δραστηριότητας με PySpark — λογική ροή και φυσική εκτέλεση</title>
+<desc id="svg-desc">Δεκαπέντε αριθμημένα βήματα σε τρεις σειρές, έπειτα driver, partitions, tasks executors και κοινός βρόχος εκπαίδευσης. Σχηματική περιγραφή, όχι καταγραφή εκτέλεσης Spark.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="context-stroke"/></marker><filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity=".2"/></filter></defs>
+<rect x="0" y="0" width="1800" height="3370" rx="0" fill="#08111f" stroke="none"/>
+<text x="40" y="57" fill="#f8fafc" font-family="DejaVu Sans" font-size="36" font-weight="700">
+<tspan x="40" dy="0">Αναγνώριση ανθρώπινης δραστηριότητας (HAR) με PySpark</tspan>
+</text>
+<rect x="20" y="174" width="1760" height="1466" rx="22" fill="#0c1828" stroke="#23364d"/>
+<text x="40" y="215" fill="#f8fafc" font-family="DejaVu Sans" font-size="23" font-weight="700">
+<tspan x="40" dy="0">01 ΛΟΓΙΚΗ ΡΟΗ ΔΕΔΟΜΕΝΩΝ ΚΑΙ ML</tspan>
+</text>
+<text x="40" y="283" fill="#c7d9ea" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="40" dy="0">Α Από αρχικές μετρήσεις σε στατιστικά παραθύρων</tspan>
+</text>
+<g id="raw" class="logical-card">
+<title>Αρχικό δείγμα αισθητήρα</title>
+<rect x="40" y="303" width="320" height="370" rx="16" fill="#102032" stroke="#38bdf8" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="41" y="321" width="4" height="334" rx="2" fill="#38bdf8" stroke="none"/>
+<rect x="58" y="321" width="32" height="32" rx="11" fill="#38bdf8" stroke="none"/>
+<text x="65" y="343" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="65" dy="0">1</tspan>
+</text>
+<text x="102" y="337" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="102" dy="0">Αρχικό δείγμα</tspan>
+<tspan x="102" dy="25">αισθητήρα</tspan>
+</text>
+<text x="62" y="391" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="62" dy="0">spark.read.text(raw_glob)</tspan>
+</text>
+<path d="M62 406 H338" stroke="#38bdf8" opacity=".25"/>
+<text x="62" y="429" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="62" dy="0">Κάθε γραμμή WISDM είναι μία</tspan>
+<tspan x="62" dy="22">μέτρηση αισθητήρα για ένα άτομο,</tspan>
+<tspan x="62" dy="22">δραστηριότητα και στιγμή. x/y/z =</tspan>
+<tspan x="62" dy="22">τρεις διευθύνσεις· accel = κίνηση.</tspan>
+<tspan x="62" dy="22">Gyro = περιστροφή· η διαδρομή</tspan>
+<tspan x="62" dy="22">δίνει συσκευή και αισθητήρα.</tspan>
+</text>
+<rect x="56" y="620" width="288" height="37" rx="9" fill="#38bdf8" stroke="none" opacity=".12"/>
+<text x="69" y="642" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="69" dy="0">άτομο, δραστηριότητα, χρόνος, x, y, z</tspan>
+</text>
+</g>
+<g id="parse" class="logical-card">
+<title>Ανάλυση και επικύρωση</title>
+<rect x="390" y="303" width="320" height="370" rx="16" fill="#102032" stroke="#2dd4bf" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="391" y="321" width="4" height="334" rx="2" fill="#2dd4bf" stroke="none"/>
+<rect x="408" y="321" width="32" height="32" rx="11" fill="#2dd4bf" stroke="none"/>
+<text x="415" y="343" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="415" dy="0">2</tspan>
+</text>
+<text x="452" y="337" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="452" dy="0">Ανάλυση και επικύρωση</tspan>
+</text>
+<text x="412" y="385" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="412" dy="0">parse_wisdm_raw() / valid_records()</tspan>
+</text>
+<path d="M412 400 H688" stroke="#2dd4bf" opacity=".25"/>
+<text x="412" y="423" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="412" dy="0">Ο parser εξάγει άτομο,</tspan>
+<tspan x="412" dy="22">δραστηριότητα, χρόνο και x/y/z σε</tspan>
+<tspan x="412" dy="22">στήλες με τύπους δεδομένων. Οι</tspan>
+<tspan x="412" dy="22">κακοσχηματισμένες γραμμές</tspan>
+<tspan x="412" dy="22">απορρίπτονται, αφήνοντας έγκυρο</tspan>
+<tspan x="412" dy="22">Spark DataFrame με καθορισμένο</tspan>
+<tspan x="412" dy="22">σχήμα.</tspan>
+</text>
+<rect x="406" y="603" width="288" height="54" rx="9" fill="#2dd4bf" stroke="none" opacity=".12"/>
+<text x="419" y="625" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="419" dy="0">συσκευή και αισθητήρας προκύπτουν</tspan>
+<tspan x="419" dy="17">από τη διαδρομή</tspan>
+</text>
+</g>
+<g id="window" class="logical-card">
+<title>Χρονικό παράθυρο</title>
+<rect x="740" y="303" width="320" height="370" rx="16" fill="#102032" stroke="#2dd4bf" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="741" y="321" width="4" height="334" rx="2" fill="#2dd4bf" stroke="none"/>
+<rect x="758" y="321" width="32" height="32" rx="11" fill="#2dd4bf" stroke="none"/>
+<text x="765" y="343" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="765" dy="0">3</tspan>
+</text>
+<text x="802" y="337" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="802" dy="0">Χρονικό παράθυρο</tspan>
+</text>
+<text x="762" y="385" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="762" dy="0">withColumn(window_id)</tspan>
+</text>
+<path d="M762 400 H1038" stroke="#2dd4bf" opacity=".25"/>
+<text x="762" y="423" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="762" dy="0">Κάθε δείγμα παίρνει window_id από</tspan>
+<tspan x="762" dy="22">τη χρονική σήμανση και τη διάρκεια</tspan>
+<tspan x="762" dy="22">των 10 δευτερολέπτων. Πρόκειται</tspan>
+<tspan x="762" dy="22">για χρονικό διάστημα μετρήσεων,</tspan>
+<tspan x="762" dy="22">όχι για φυσικό partition του Spark.</tspan>
+</text>
+<rect x="756" y="620" width="288" height="37" rx="9" fill="#2dd4bf" stroke="none" opacity=".12"/>
+<text x="769" y="642" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="769" dy="0">ΧΡΟΝΙΚΟ ΠΑΡΑΘΥΡΟ ≠ SPARK PARTITION</tspan>
+</text>
+</g>
+<g id="group" class="logical-card">
+<title>Ομαδοποίηση δειγμάτων</title>
+<rect x="1090" y="303" width="320" height="370" rx="16" fill="#102032" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1091" y="321" width="4" height="334" rx="2" fill="#a78bfa" stroke="none"/>
+<rect x="1108" y="321" width="32" height="32" rx="11" fill="#a78bfa" stroke="none"/>
+<text x="1115" y="343" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="1115" dy="0">4</tspan>
+</text>
+<text x="1152" y="337" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="1152" dy="0">Ομαδοποίηση δειγμάτων</tspan>
+</text>
+<text x="1112" y="385" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1112" dy="0">groupBy(...).agg(...)</tspan>
+</text>
+<path d="M1112 400 H1388" stroke="#a78bfa" opacity=".25"/>
+<text x="1112" y="423" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="1112" dy="0">Το Spark ομαδοποιεί γραμμές με</tspan>
+<tspan x="1112" dy="22">ίδιο άτομο, δραστηριότητα,</tspan>
+<tspan x="1112" dy="22">συσκευή, αισθητήρα και παράθυρο.</tspan>
+<tspan x="1112" dy="22">Ένα shuffle μετακινεί γραμμές όταν</tspan>
+<tspan x="1112" dy="22">χρειάζεται, ώστε να συνοψιστεί ένα</tspan>
+<tspan x="1112" dy="22">παράθυρο κίνησης.</tspan>
+</text>
+<rect x="1106" y="603" width="288" height="54" rx="9" fill="#a78bfa" stroke="none" opacity=".12"/>
+<text x="1119" y="625" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="1119" dy="0">shuffle: ανακατανομή γραμμών μεταξύ</tspan>
+<tspan x="1119" dy="17">partitions</tspan>
+</text>
+</g>
+<g id="features" class="logical-card">
+<title>Υπολογισμός χαρακτηριστικών</title>
+<rect x="1440" y="303" width="320" height="370" rx="16" fill="#102032" stroke="#fb923c" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1441" y="321" width="4" height="334" rx="2" fill="#fb923c" stroke="none"/>
+<rect x="1458" y="321" width="32" height="32" rx="11" fill="#fb923c" stroke="none"/>
+<text x="1465" y="343" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="1465" dy="0">5</tspan>
+</text>
+<text x="1502" y="337" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="1502" dy="0">Υπολογισμός</tspan>
+<tspan x="1502" dy="25">χαρακτηριστικών</tspan>
+</text>
+<text x="1462" y="391" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1462" dy="0">build_window_features()</tspan>
+</text>
+<path d="M1462 406 H1738" stroke="#fb923c" opacity=".25"/>
+<text x="1462" y="429" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="1462" dy="0">Πολλά δείγματα ενός παραθύρου</tspan>
+<tspan x="1462" dy="22">γίνονται μία γραμμή με 18</tspan>
+<tspan x="1462" dy="22">στατιστικά επιλεγμένα από τον</tspan>
+<tspan x="1462" dy="22">σχεδιαστή. Μέσοι όροι, εύρη, μέτρο,</tspan>
+<tspan x="1462" dy="22">ενέργεια και συσχετίσεις</tspan>
+<tspan x="1462" dy="22">περιγράφουν την κίνηση.</tspan>
+</text>
+<rect x="1456" y="603" width="288" height="54" rx="9" fill="#fb923c" stroke="none" opacity=".12"/>
+<text x="1469" y="625" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="1469" dy="0">μέσος/απόκλιση/min/max • μέτρο •</tspan>
+<tspan x="1469" dy="17">ενέργεια • συσχέτιση</tspan>
+</text>
+</g>
+<path d="M360 488 H388" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M710 488 H738" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1060 488 H1088" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1410 488 H1438" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1760 488 H1770 V697 H30 V773 H40" fill="none" stroke="#94a9c3" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<rect x="51" y="684" width="218" height="27" rx="7" fill="#0a1423" stroke="none"/>
+<text x="60" y="702" fill="#b6c8dd" font-family="DejaVu Sans" font-size="13" font-weight="700">
+<tspan x="60" dy="0">ΣΥΝΕΧΕΙΑ → ΒΗΜΑ 6</tspan>
+</text>
+<text x="40" y="723" fill="#c7d9ea" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="40" dy="0">Β Από καθαρά παράθυρα σε διανύσματα για το μοντέλο</tspan>
+</text>
+<g id="clean" class="logical-card">
+<title>Ποιότητα παραθύρων</title>
+<rect x="40" y="743" width="320" height="370" rx="16" fill="#102032" stroke="#fb923c" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="41" y="761" width="4" height="334" rx="2" fill="#fb923c" stroke="none"/>
+<rect x="58" y="761" width="32" height="32" rx="11" fill="#fb923c" stroke="none"/>
+<text x="65" y="783" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="65" dy="0">6</tspan>
+</text>
+<text x="102" y="777" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="102" dy="0">Ποιότητα παραθύρων</tspan>
+</text>
+<text x="62" y="825" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="62" dy="0">where() + χειρισμός null/NaN</tspan>
+</text>
+<path d="M62 840 H338" stroke="#fb923c" opacity=".25"/>
+<text x="62" y="863" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="62" dy="0">Παράθυρα με λίγες μετρήσεις</tspan>
+<tspan x="62" dy="22">αφαιρούνται. Ελλείπουσες τιμές</tspan>
+<tspan x="62" dy="22">(null/NaN) γίνονται μηδέν με συνεπή</tspan>
+<tspan x="62" dy="22">τρόπο, παράγοντας πλήρεις</tspan>
+<tspan x="62" dy="22">γραμμές πριν από τη σύντηξη και</tspan>
+<tspan x="62" dy="22">την εκπαίδευση μοντέλου.</tspan>
+</text>
+<rect x="56" y="1026" width="288" height="71" rx="9" fill="#fb923c" stroke="none" opacity=".12"/>
+<text x="69" y="1048" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="69" dy="0">ο καθαρισμός ακολουθεί την</tspan>
+<tspan x="69" dy="17">ομαδοποίηση, επειδή χρησιμοποιεί τα</tspan>
+<tspan x="69" dy="17">αποτελέσματά της</tspan>
+</text>
+</g>
+<g id="fusion" class="logical-card">
+<title>Σύντηξη accel και gyro</title>
+<rect x="390" y="743" width="320" height="370" rx="16" fill="#102032" stroke="#2dd4bf" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="391" y="761" width="4" height="334" rx="2" fill="#2dd4bf" stroke="none"/>
+<rect x="408" y="761" width="32" height="32" rx="11" fill="#2dd4bf" stroke="none"/>
+<text x="415" y="783" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="415" dy="0">7</tspan>
+</text>
+<text x="452" y="777" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="452" dy="0">Σύντηξη accel και gyro</tspan>
+</text>
+<text x="412" y="825" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="412" dy="0">fuse_sensor_features()</tspan>
+</text>
+<path d="M412 840 H688" stroke="#2dd4bf" opacity=".25"/>
+<text x="412" y="863" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="412" dy="0">Τα χαρακτηριστικά επιταχυνσιομέτρου</tspan>
+<tspan x="412" dy="22">και γυροσκοπίου της ίδιας συσκευής</tspan>
+<tspan x="412" dy="22">και παραθύρου ενώνονται με inner</tspan>
+<tspan x="412" dy="22">join. Το ρολόι αποκτά 36 τιμές·</tspan>
+<tspan x="412" dy="22">κινητό και ρολόι δεν</tspan>
+<tspan x="412" dy="22">αναμειγνύονται ποτέ.</tspan>
+</text>
+<rect x="406" y="1060" width="288" height="37" rx="9" fill="#2dd4bf" stroke="none" opacity=".12"/>
+<text x="419" y="1082" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="419" dy="0">36 = 18 accel + 18 gyro· μόνο ρολόι</tspan>
+</text>
+</g>
+<g id="xy" class="logical-card">
+<title>Παράδειγμα μάθησης (X → y)</title>
+<rect x="740" y="743" width="320" height="370" rx="16" fill="#102032" stroke="#f472b6" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="741" y="761" width="4" height="334" rx="2" fill="#f472b6" stroke="none"/>
+<rect x="758" y="761" width="32" height="32" rx="11" fill="#f472b6" stroke="none"/>
+<text x="765" y="783" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="765" dy="0">8</tspan>
+</text>
+<text x="802" y="777" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="802" dy="0">Παράδειγμα μάθησης (X</tspan>
+<tspan x="802" dy="25">→ y)</tspan>
+</text>
+<text x="762" y="831" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="762" dy="0">γραμμή DataFrame έτοιμη για μοντέλο</tspan>
+</text>
+<path d="M762 846 H1038" stroke="#f472b6" opacity=".25"/>
+<text x="762" y="869" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="762" dy="0">Κάθε συνδυασμένο παράθυρο</tspan>
+<tspan x="762" dy="22">δίνει μία εγγραφή με 36 τιμές</tspan>
+<tspan x="762" dy="22">χαρακτηριστικών (X) και τη γνωστή</tspan>
+<tspan x="762" dy="22">δραστηριότητα (y). Το μοντέλο</tspan>
+<tspan x="762" dy="22">χρησιμοποιεί το X για να</tspan>
+<tspan x="762" dy="22">προβλέψει τη δραστηριότητα.</tspan>
+</text>
+<rect x="756" y="1043" width="288" height="54" rx="9" fill="#f472b6" stroke="none" opacity=".12"/>
+<text x="769" y="1065" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="769" dy="0">μία γραμμή = ένα παράθυρο κίνησης με</tspan>
+<tspan x="769" dy="17">ετικέτα</tspan>
+</text>
+</g>
+<g id="split" class="logical-card">
+<title>Διαχωρισμός δεδομένων</title>
+<rect x="1090" y="743" width="320" height="370" rx="16" fill="#102032" stroke="#facc15" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1091" y="761" width="4" height="334" rx="2" fill="#facc15" stroke="none"/>
+<rect x="1108" y="761" width="32" height="32" rx="11" fill="#facc15" stroke="none"/>
+<text x="1115" y="783" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="1115" dy="0">9</tspan>
+</text>
+<text x="1152" y="777" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="1152" dy="0">Διαχωρισμός δεδομένων</tspan>
+</text>
+<text x="1112" y="825" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1112" dy="0">assign_subject_splits()</tspan>
+</text>
+<path d="M1112 840 H1388" stroke="#facc15" opacity=".25"/>
+<text x="1112" y="863" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="1112" dy="0">Οι καταγραφές κάθε ατόμου</tspan>
+<tspan x="1112" dy="22">ανήκουν σε ένα σύνολο: δεδομένα</tspan>
+<tspan x="1112" dy="22">35 ατόμων για εκπαίδευση, 8 για</tspan>
+<tspan x="1112" dy="22">επικύρωση και 8 για δοκιμή,</tspan>
+<tspan x="1112" dy="22">χωρίς κοινά άτομα μεταξύ τους.</tspan>
+</text>
+<rect x="1106" y="1043" width="288" height="54" rx="9" fill="#facc15" stroke="none" opacity=".12"/>
+<text x="1119" y="1065" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="1119" dy="0">Δεδομένα 35 / 8 / 8 ατόμων</tspan>
+<tspan x="1119" dy="17">εκπαίδευση / επικύρωση / δοκιμή</tspan>
+</text>
+</g>
+<g id="schema" class="logical-card">
+<title>Σχήμα και VectorAssembler</title>
+<rect x="1440" y="743" width="320" height="370" rx="16" fill="#102032" stroke="#f472b6" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1441" y="761" width="4" height="334" rx="2" fill="#f472b6" stroke="none"/>
+<rect x="1458" y="761" width="32" height="32" rx="11" fill="#f472b6" stroke="none"/>
+<text x="1465" y="783" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="1465" dy="0">10</tspan>
+</text>
+<text x="1502" y="777" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="1502" dy="0">Σχήμα και</tspan>
+<tspan x="1502" dy="25">VectorAssembler</tspan>
+</text>
+<text x="1462" y="831" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1462" dy="0">model_feature_columns() →</tspan>
+<tspan x="1462" dy="18">VectorAssembler</tspan>
+</text>
+<path d="M1462 864 H1738" stroke="#f472b6" opacity=".25"/>
+<text x="1462" y="887" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="1462" dy="0">Το σχήμα ορίζει τις 36 στήλες και τη</tspan>
+<tspan x="1462" dy="22">σειρά τους. Ο VectorAssembler τις</tspan>
+<tspan x="1462" dy="22">συγκεντρώνει σε ένα διάνυσμα</tspan>
+<tspan x="1462" dy="22">εισόδου X του Spark. Δεν υπολογίζει</tspan>
+<tspan x="1462" dy="22">νέα χαρακτηριστικά.</tspan>
+<tspan x="1462" dy="22"/>
+<tspan x="1462" dy="22"/>
+</text>
+<rect x="1456" y="1043" width="288" height="54" rx="9" fill="#f472b6" stroke="none" opacity=".12"/>
+<text x="1469" y="1065" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="1469" dy="0">σταθερός κατάλογος 36 στηλών· όχι νέα</tspan>
+<tspan x="1469" dy="17">χαρακτηριστικά</tspan>
+</text>
+</g>
+<path d="M360 928 H388" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M710 928 H738" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1060 928 H1088" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1410 928 H1438" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1760 928 H1770 V1137 H30 V1213 H40" fill="none" stroke="#94a9c3" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<rect x="51" y="1124" width="218" height="27" rx="7" fill="#0a1423" stroke="none"/>
+<text x="60" y="1142" fill="#b6c8dd" font-family="DejaVu Sans" font-size="13" font-weight="700">
+<tspan x="60" dy="0">ΣΥΝΕΧΕΙΑ → ΒΗΜΑ 11</tspan>
+</text>
+<text x="40" y="1163" fill="#c7d9ea" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="40" dy="0">Γ Από τον ορισμό του μοντέλου στην αξιολόγηση</tspan>
+</text>
+<g id="recipe" class="logical-card">
+<title>Ορισμός pipeline ML</title>
+<rect x="40" y="1183" width="320" height="370" rx="16" fill="#102032" stroke="#f472b6" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="41" y="1201" width="4" height="334" rx="2" fill="#f472b6" stroke="none"/>
+<rect x="58" y="1201" width="32" height="32" rx="11" fill="#f472b6" stroke="none"/>
+<text x="65" y="1223" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="65" dy="0">11</tspan>
+</text>
+<text x="102" y="1217" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="102" dy="0">Ορισμός pipeline ML</tspan>
+</text>
+<text x="62" y="1265" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="62" dy="0">_pipeline()</tspan>
+</text>
+<path d="M62 1280 H338" stroke="#f472b6" opacity=".25"/>
+<text x="62" y="1303" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="62" dy="0">Το Pipeline ορίζει τα στάδια:</tspan>
+<tspan x="62" dy="22">κωδικοποίηση δραστηριότητας,</tspan>
+<tspan x="62" dy="22">διάνυσμα χαρακτηριστικών,</tspan>
+<tspan x="62" dy="22">τυποποίηση και ταξινόμηση.</tspan>
+<tspan x="62" dy="22">Οι παράμετροι προσδιορίζονται</tspan>
+<tspan x="62" dy="22">αργότερα, κατά την εκπαίδευση.</tspan>
+</text>
+<rect x="56" y="1483" width="288" height="54" rx="9" fill="#f472b6" stroke="none" opacity=".12"/>
+<text x="69" y="1505" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="69" dy="0">Ετικέτα → Διάνυσμα → Κλιμάκωση →</tspan>
+<tspan x="69" dy="17">Ταξινομητής</tspan>
+</text>
+</g>
+<g id="fit" class="logical-card">
+<title>Κατανεμημένη εκπαίδευση</title>
+<rect x="390" y="1183" width="320" height="370" rx="16" fill="#102032" stroke="#f472b6" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="391" y="1201" width="4" height="334" rx="2" fill="#f472b6" stroke="none"/>
+<rect x="408" y="1201" width="32" height="32" rx="11" fill="#f472b6" stroke="none"/>
+<text x="415" y="1223" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="415" dy="0">12</tspan>
+</text>
+<text x="452" y="1217" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="452" dy="0">Κατανεμημένη</tspan>
+<tspan x="452" dy="25">εκπαίδευση</tspan>
+</text>
+<text x="412" y="1271" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="412" dy="0">Pipeline.fit(train)</tspan>
+</text>
+<path d="M412 1286 H688" stroke="#f472b6" opacity=".25"/>
+<text x="412" y="1309" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="412" dy="0">Το Pipeline.fit(train) χρησιμοποιεί</tspan>
+<tspan x="412" dy="22">μόνο δεδομένα εκπαίδευσης. Οι</tspan>
+<tspan x="412" dy="22">executors υπολογίζουν επιμέρους</tspan>
+<tspan x="412" dy="22">αποτελέσματα και συνεργάζονται για</tspan>
+<tspan x="412" dy="22">την εκπαίδευση ενός PipelineModel.</tspan>
+<tspan x="412" dy="22"/>
+</text>
+<rect x="406" y="1500" width="288" height="37" rx="9" fill="#f472b6" stroke="none" opacity=".12"/>
+<text x="419" y="1522" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="419" dy="0">το fit() ενεργοποιεί κοινή εκπαίδευση</tspan>
+</text>
+</g>
+<g id="fitted" class="logical-card">
+<title>Εκπαιδευμένο PipelineModel</title>
+<rect x="740" y="1183" width="320" height="370" rx="16" fill="#102032" stroke="#4ade80" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="741" y="1201" width="4" height="334" rx="2" fill="#4ade80" stroke="none"/>
+<rect x="758" y="1201" width="32" height="32" rx="11" fill="#4ade80" stroke="none"/>
+<text x="765" y="1223" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="765" dy="0">13</tspan>
+</text>
+<text x="802" y="1217" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="802" dy="0">Εκπαιδευμένο</tspan>
+<tspan x="802" dy="25">PipelineModel</tspan>
+</text>
+<text x="762" y="1271" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="762" dy="0">αποθηκευμένο εκπαιδευμένο μοντέλο</tspan>
+</text>
+<path d="M762 1286 H1038" stroke="#4ade80" opacity=".25"/>
+<text x="762" y="1309" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="762" dy="0">Το PipelineModel περιέχει όλα</tspan>
+<tspan x="762" dy="22">τα προσαρμοσμένα στάδια, από</tspan>
+<tspan x="762" dy="22">την κωδικοποίηση δραστηριότητας</tspan>
+<tspan x="762" dy="22">έως τον ταξινομητή. Μπορεί να</tspan>
+<tspan x="762" dy="22">χρησιμοποιηθεί ξανά: είναι ένα</tspan>
+<tspan x="762" dy="22">μοντέλο, όχι ένα ανά executor.</tspan>
+</text>
+<rect x="756" y="1500" width="288" height="37" rx="9" fill="#4ade80" stroke="none" opacity=".12"/>
+<text x="769" y="1522" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="769" dy="0">όχι ένα μοντέλο ανά executor ή partition</tspan>
+</text>
+</g>
+<g id="predict" class="logical-card">
+<title>Πρόβλεψη στο σύνολο δοκιμής</title>
+<rect x="1090" y="1183" width="320" height="370" rx="16" fill="#102032" stroke="#4ade80" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1091" y="1201" width="4" height="334" rx="2" fill="#4ade80" stroke="none"/>
+<rect x="1108" y="1201" width="32" height="32" rx="11" fill="#4ade80" stroke="none"/>
+<text x="1115" y="1223" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="1115" dy="0">14</tspan>
+</text>
+<text x="1152" y="1217" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="1152" dy="0">Πρόβλεψη στο</tspan>
+<tspan x="1152" dy="25">σύνολο δοκιμής</tspan>
+</text>
+<text x="1112" y="1271" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1112" dy="0">fitted.transform(test)</tspan>
+</text>
+<path d="M1112 1286 H1388" stroke="#4ade80" opacity=".25"/>
+<text x="1112" y="1309" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="1112" dy="0">Το εκπαιδευμένο μοντέλο</tspan>
+<tspan x="1112" dy="22">επεξεργάζεται παράλληλα</tspan>
+<tspan x="1112" dy="22">παράθυρα από τα 8 άτομα της</tspan>
+<tspan x="1112" dy="22">δοκιμής. Για κάθε παράθυρο</tspan>
+<tspan x="1112" dy="22">διατηρείται η πραγματική</tspan>
+<tspan x="1112" dy="22">δραστηριότητα και προστίθεται</tspan>
+<tspan x="1112" dy="22">η πρόβλεψη του μοντέλου.</tspan>
+</text>
+<rect x="1106" y="1483" width="288" height="54" rx="9" fill="#4ade80" stroke="none" opacity=".12"/>
+<text x="1119" y="1505" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="1119" dy="0">τα άτομα test δεν εμφανίζονται ποτέ στο</tspan>
+<tspan x="1119" dy="17">train</tspan>
+</text>
+</g>
+<g id="evaluate" class="logical-card">
+<title>Αξιολόγηση και τεκμήρια</title>
+<rect x="1440" y="1183" width="320" height="370" rx="16" fill="#102032" stroke="#4ade80" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1441" y="1201" width="4" height="334" rx="2" fill="#4ade80" stroke="none"/>
+<rect x="1458" y="1201" width="32" height="32" rx="11" fill="#4ade80" stroke="none"/>
+<text x="1465" y="1223" fill="#07111f" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="1465" dy="0">15</tspan>
+</text>
+<text x="1502" y="1217" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="1502" dy="0">Αξιολόγηση και</tspan>
+<tspan x="1502" dy="25">τεκμήρια</tspan>
+</text>
+<text x="1462" y="1271" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1462" dy="0">_confusion_and_macro_metrics()</tspan>
+</text>
+<path d="M1462 1286 H1738" stroke="#4ade80" opacity=".25"/>
+<text x="1462" y="1309" fill="#dbe5f2" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="1462" dy="0">Πραγματικές και προβλεπόμενες</tspan>
+<tspan x="1462" dy="22">δραστηριότητες σχηματίζουν</tspan>
+<tspan x="1462" dy="22">πίνακα σύγχυσης. Accuracy, macro</tspan>
+<tspan x="1462" dy="22">precision, recall και F1 συνοψίζουν</tspan>
+<tspan x="1462" dy="22">την απόδοση ανά δραστηριότητα·</tspan>
+<tspan x="1462" dy="22">το weighted F1 λαμβάνει υπόψη το</tspan>
+<tspan x="1462" dy="22">μέγεθος κλάσης. Αποθηκεύονται</tspan>
+<tspan x="1462" dy="22">μοντέλο και τεκμήρια JSON.</tspan>
+</text>
+<rect x="1456" y="1483" width="288" height="54" rx="9" fill="#4ade80" stroke="none" opacity=".12"/>
+<text x="1469" y="1505" fill="#dbe9f5" font-family="DejaVu Sans" font-size="11" font-weight="700">
+<tspan x="1469" dy="0">accuracy = % σωστών • F1: ισορροπία</tspan>
+<tspan x="1469" dy="17">παραλείψεων και ψευδών συναγερμών</tspan>
+</text>
+</g>
+<path d="M360 1368 H388" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M710 1368 H738" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1060 1368 H1088" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1410 1368 H1438" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="45" y="1590" fill="#cee8fa" font-family="DejaVu Sans" font-size="16" font-weight="700">
+<tspan x="45" dy="0">Ένα DataFrame περιγράφει πινακοειδή δεδομένα και ένα lazy σχέδιο· τα δεδομένα μπορεί να είναι τοπικά ή κατανεμημένα.</tspan>
+</text>
+<rect x="20" y="1670" width="1760" height="1660" rx="22" fill="#0c1828" stroke="#393455"/>
+<text x="40" y="1714" fill="#f8fafc" font-family="DejaVu Sans" font-size="23" font-weight="700">
+<tspan x="40" dy="0">02 ΦΥΣΙΚΗ ΕΚΤΕΛΕΣΗ SPARK</tspan>
+</text>
+<text x="40" y="1745" fill="#a9bdd3" font-family="DejaVu Sans" font-size="16" font-weight="400">
+<tspan x="40" dy="0">Partitions και tasks εκτελούν το σχέδιο· οι συνεργαζόμενοι workers παράγουν ένα μοντέλο ανά εκπαιδευμένο pipeline.</tspan>
+</text>
+<text x="490" y="1780" fill="#f5bcdf" font-family="DejaVu Sans" font-size="15" font-weight="700">
+<tspan x="490" dy="0">Βήμα 12: το fit() ενεργοποιεί εκπαίδευση. Τα προηγούμενα count() επίσης εκτελούν Spark jobs.</tspan>
+</text>
+<g id="spark-glossary" class="physical-card">
+<title>ΤΕΣΣΕΡΙΣ ΟΡΟΙ SPARK</title>
+<rect x="40" y="1784" width="410" height="238" rx="16" fill="#102032" stroke="#64748b" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="41" y="1802" width="4" height="202" rx="2" fill="#64748b" stroke="none"/>
+<text x="62" y="1818" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="62" dy="0">ΤΕΣΣΕΡΙΣ ΟΡΟΙ SPARK</tspan>
+</text>
+<path d="M62 1838 H428" stroke="#64748b" opacity=".25"/>
+<text x="62" y="1861" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">partition = ένα τμήμα δεδομένων</tspan>
+</text>
+<text x="62" y="1891" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">executor = διεργασία που εκτελεί tasks</tspan>
+</text>
+<text x="62" y="1921" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">shuffle = ανακατανομή γραμμών ανά κλειδί μεταξύ</tspan>
+<tspan x="62" dy="22">partitions</tspan>
+</text>
+<text x="62" y="1973" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">broadcast = ο driver στέλνει τα ίδια δεδομένα σε</tspan>
+<tspan x="62" dy="22">κάθε worker</tspan>
+</text>
+</g>
+<g id="driver" class="physical-card">
+<title>Driver — το πρόγραμμα PySpark που συντονίζει</title>
+<rect x="490" y="1800" width="1270" height="172" rx="16" fill="#102032" stroke="#facc15" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="491" y="1818" width="4" height="136" rx="2" fill="#facc15" stroke="none"/>
+<text x="512" y="1834" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="512" dy="0">Driver — το πρόγραμμα PySpark που συντονίζει</tspan>
+</text>
+<text x="512" y="1862" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="512" dy="0">δημιουργεί το σχέδιο (DAG)· προγραμματίζει tasks· συντονίζει το fit()</tspan>
+</text>
+<path d="M512 1877 H1738" stroke="#facc15" opacity=".25"/>
+<text x="512" y="1900" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="512" dy="0">• στέλνει κώδικα tasks, αναφορές partitions και κατάσταση broadcast</tspan>
+</text>
+<text x="512" y="1930" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="512" dy="0">• κρατά ρυθμίσεις και μικρές συλλεγμένες συνόψεις — όχι το αρχικό σύνολο δεδομένων</tspan>
+</text>
+</g>
+<g id="storage" class="physical-card">
+<title>Αποθήκευση / cache</title>
+<rect x="40" y="2110" width="320" height="270" rx="16" fill="#102032" stroke="#38bdf8" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="41" y="2128" width="4" height="234" rx="2" fill="#38bdf8" stroke="none"/>
+<text x="62" y="2144" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="62" dy="0">Αποθήκευση / cache</tspan>
+</text>
+<text x="62" y="2172" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="62" dy="0">αρχεία • cache • shuffle</tspan>
+</text>
+<path d="M62 2187 H338" stroke="#38bdf8" opacity=".25"/>
+<text x="62" y="2210" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">• κρατά τα πραγματικά δεδομένα</tspan>
+<tspan x="62" dy="22">partitions</tspan>
+</text>
+<text x="62" y="2262" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">• οι executors διαβάζουν τα</tspan>
+<tspan x="62" dy="22">ανατεθειμένα blocks</tspan>
+</text>
+<text x="62" y="2314" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">• ο driver δεν αναμεταδίδει όλες τις</tspan>
+<tspan x="62" dy="22">γραμμές</tspan>
+</text>
+</g>
+<g id="partitions" class="physical-card">
+<title>Υπάρχοντα partitions</title>
+<rect x="390" y="2110" width="320" height="270" rx="16" fill="#102032" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="391" y="2128" width="4" height="234" rx="2" fill="#a78bfa" stroke="none"/>
+<text x="412" y="2144" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="412" dy="0">Υπάρχοντα partitions</tspan>
+</text>
+<text x="412" y="2172" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="412" dy="0">φυσικά τμήματα δεδομένων</tspan>
+</text>
+<path d="M412 2187 H688" stroke="#a78bfa" opacity=".25"/>
+<text x="412" y="2210" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="412" dy="0">• η είσοδος είναι ήδη χωρισμένη σε</tspan>
+<tspan x="412" dy="22">partitions</tspan>
+</text>
+<text x="412" y="2262" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="412" dy="0">• ένα task συνήθως χειρίζεται ένα</tspan>
+<tspan x="412" dy="22">partition</tspan>
+</text>
+<text x="412" y="2314" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="412" dy="0">• partition ≠ χρονικό παράθυρο</tspan>
+</text>
+</g>
+<g id="executors" class="physical-card">
+<title>Εργασίες executors</title>
+<rect x="740" y="2110" width="320" height="270" rx="16" fill="#102032" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="741" y="2128" width="4" height="234" rx="2" fill="#a78bfa" stroke="none"/>
+<text x="762" y="2144" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="762" dy="0">Εργασίες executors</tspan>
+</text>
+<text x="762" y="2172" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="762" dy="0">διεργασία worker JVM· όχι VM</tspan>
+</text>
+<path d="M762 2187 H1038" stroke="#a78bfa" opacity=".25"/>
+<text x="762" y="2210" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="762" dy="0">• P1 → task σταδίου → μερικό</tspan>
+<tspan x="762" dy="22">αποτέλεσμα</tspan>
+</text>
+<text x="762" y="2262" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="762" dy="0">• P2 → task σταδίου → μερικό</tspan>
+<tspan x="762" dy="22">αποτέλεσμα</tspan>
+</text>
+<text x="762" y="2314" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="762" dy="0">• οι executors εκτελούν πολλά tasks</tspan>
+<tspan x="762" dy="22">με τον χρόνο</tspan>
+</text>
+</g>
+<g id="combine" class="physical-card">
+<title>Συνδυασμός αποτελεσμάτων</title>
+<rect x="1090" y="2110" width="320" height="270" rx="16" fill="#102032" stroke="#fb923c" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1091" y="2128" width="4" height="234" rx="2" fill="#fb923c" stroke="none"/>
+<text x="1112" y="2144" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="1112" dy="0">Συνδυασμός αποτελεσμάτων</tspan>
+</text>
+<text x="1112" y="2172" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1112" dy="0">συγκέντρωση κατανεμημένων</tspan>
+<tspan x="1112" dy="18">αποτελεσμάτων</tspan>
+</text>
+<path d="M1112 2205 H1388" stroke="#fb923c" opacity=".25"/>
+<text x="1112" y="2228" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1112" dy="0">• Logistic Regression (LR): gradients</tspan>
+</text>
+<text x="1112" y="2258" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1112" dy="0">• Random Forest (RF): στατιστικά</tspan>
+<tspan x="1112" dy="22">splits</tspan>
+</text>
+<text x="1112" y="2310" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1112" dy="0">• συνδυασμός αντίστοιχης κοινής</tspan>
+<tspan x="1112" dy="22">κατάστασης</tspan>
+</text>
+</g>
+<g id="update" class="physical-card">
+<title>Ενημέρωση κοινής κατάστασης</title>
+<rect x="1440" y="2110" width="320" height="270" rx="16" fill="#102032" stroke="#f472b6" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1441" y="2128" width="4" height="234" rx="2" fill="#f472b6" stroke="none"/>
+<text x="1462" y="2144" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="1462" dy="0">Ενημέρωση κοινής</tspan>
+<tspan x="1462" dy="27">κατάστασης</tspan>
+</text>
+<text x="1462" y="2199" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1462" dy="0">μία συντονισμένη διαδικασία μάθησης</tspan>
+</text>
+<path d="M1462 2214 H1738" stroke="#f472b6" opacity=".25"/>
+<text x="1462" y="2237" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1462" dy="0">• ο optimizer ενημερώνει συντελεστές</tspan>
+</text>
+<text x="1462" y="2267" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1462" dy="0">• ή επιλέγονται βέλτιστα splits</tspan>
+<tspan x="1462" dy="22">δέντρων</tspan>
+</text>
+<text x="1462" y="2319" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1462" dy="0">• broadcast κατάστασης· επανάληψη</tspan>
+</text>
+</g>
+<path d="M360 2245 H388" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M710 2245 H738" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1060 2245 H1088" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M1410 2245 H1438" fill="none" stroke="#859bb6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M900 1972 V2108" fill="none" stroke="#f472b6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)" stroke-dasharray="8 6"/>
+<rect x="936" y="1989" width="508" height="27" rx="7" fill="#0a1423" stroke="none"/>
+<text x="945" y="2007" fill="#f5bcdf" font-family="DejaVu Sans" font-size="13" font-weight="700">
+<tspan x="945" dy="0">Κώδικας tasks + αναφορές partitions + κατάσταση broadcast</tspan>
+</text>
+<path d="M1600 2110 V2060 H950 V2108" fill="none" stroke="#f472b6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)" stroke-dasharray="8 6"/>
+<rect x="1001" y="2032" width="528" height="27" rx="7" fill="#0a1423" stroke="none"/>
+<text x="1010" y="2050" fill="#f5bcdf" font-family="DejaVu Sans" font-size="13" font-weight="700">
+<tspan x="1010" dy="0">Ενημερωμένη κοινή κατάσταση → επόμενη κοινή επανάληψη</tspan>
+</text>
+<g id="shuffle" class="physical-card">
+<title>Shuffle της groupBy</title>
+<rect x="40" y="2440" width="670" height="234" rx="16" fill="#102032" stroke="#fb923c" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="41" y="2458" width="4" height="198" rx="2" fill="#fb923c" stroke="none"/>
+<text x="62" y="2474" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="62" dy="0">Shuffle της groupBy</tspan>
+</text>
+<text x="62" y="2502" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="62" dy="0">ανακατανέμει υπάρχοντα partitions ανά κλειδί</tspan>
+</text>
+<path d="M62 2517 H688" stroke="#fb923c" opacity=".25"/>
+<text x="62" y="2540" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">• συναντώνται ίδια κλειδιά παραθύρων</tspan>
+</text>
+<text x="62" y="2570" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="62" dy="0">• τα partitions υπήρχαν πριν το shuffle</tspan>
+</text>
+</g>
+<path d="M550 2380 V2438" fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<g id="not-models" class="physical-card">
+<title>✕ Όχι ανεξάρτητα μοντέλα</title>
+<rect x="740" y="2440" width="670" height="234" rx="16" fill="#102032" stroke="#fb7185" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="741" y="2458" width="4" height="198" rx="2" fill="#fb7185" stroke="none"/>
+<text x="762" y="2474" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="762" dy="0">✕ Όχι ανεξάρτητα μοντέλα</tspan>
+</text>
+<text x="762" y="2502" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="762" dy="0">η λανθασμένη ερμηνεία</tspan>
+</text>
+<path d="M762 2517 H1388" stroke="#fb7185" opacity=".25"/>
+<text x="762" y="2540" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="762" dy="0">• ΟΧΙ partition 1 → μοντέλο 1</tspan>
+</text>
+<text x="762" y="2570" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="762" dy="0">• ΟΧΙ partition 2 → μοντέλο 2</tspan>
+</text>
+<text x="762" y="2600" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="762" dy="0">• ΟΧΙ επιλογή/συγχώνευση μοντέλων executors</tspan>
+</text>
+</g>
+<g id="one-model" class="physical-card">
+<title>ΕΝΑ εκπαιδευμένο μοντέλο</title>
+<rect x="1440" y="2440" width="320" height="234" rx="16" fill="#102032" stroke="#4ade80" stroke-width="1.5" filter="url(#shadow)"/>
+<rect x="1441" y="2458" width="4" height="198" rx="2" fill="#4ade80" stroke="none"/>
+<text x="1462" y="2474" fill="#f8fafc" font-family="DejaVu Sans" font-size="18" font-weight="700">
+<tspan x="1462" dy="0">ΕΝΑ εκπαιδευμένο μοντέλο</tspan>
+</text>
+<text x="1462" y="2502" fill="#a7bed4" font-family="DejaVu Sans Mono" font-size="12" font-weight="400">
+<tspan x="1462" dy="0">ένα λογικό PipelineModel</tspan>
+</text>
+<path d="M1462 2517 H1738" stroke="#4ade80" opacity=".25"/>
+<text x="1462" y="2540" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1462" dy="0">• ένας πίνακας συντελεστών LR</tspan>
+</text>
+<text x="1462" y="2570" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1462" dy="0">• ή ένα δάσος με 80 δέντρα</tspan>
+</text>
+<text x="1462" y="2600" fill="#dbe5f2" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="1462" dy="0">• περιέχει τα προσαρμοσμένα στάδια</tspan>
+</text>
+</g>
+<path d="M1600 2380 V2438" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<rect x="1428" y="2400" width="338" height="27" rx="7" fill="#0a1423" stroke="none"/>
+<text x="1437" y="2418" fill="#8ce7ac" font-family="DejaVu Sans" font-size="13" font-weight="700">
+<tspan x="1437" dy="0">Μετά τη σύγκλιση / ολοκλήρωση fit</tspan>
+</text>
+<g id="global-training-loop">
+<rect x="40" y="2730" width="1720" height="290" rx="18" fill="#201b32" stroke="#d87aba"/>
+<text x="64" y="2770" fill="#f8fafc" font-family="DejaVu Sans" font-size="22" font-weight="700">
+<tspan x="64" dy="0">ΕΝΑΣ ΚΟΙΝΟΣ ΒΡΟΧΟΣ ΕΚΠΑΙΔΕΥΣΗΣ</tspan>
+</text>
+<text x="64" y="2798" fill="#b9adce" font-family="DejaVu Sans" font-size="14" font-weight="400">
+<tspan x="64" dy="0">Εννοιολογικοί βρόχοι αλγορίθμων — όχι κυριολεκτικό ίχνος σταδίων Spark</tspan>
+</text>
+<text x="64" y="2840" fill="#f4b8dc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="64" dy="0">Logistic Regression:</tspan>
+</text>
+<text x="330" y="2840" fill="#e1e8f3" font-family="DejaVu Sans" font-size="17" font-weight="400">
+<tspan x="330" dy="0">broadcast συντελεστών → μερική απώλεια/gradient ανά partition → συνδυασμός → ενημέρωση ενός πίνακα συντελεστών → επανάληψη</tspan>
+</text>
+<text x="64" y="2914" fill="#f4b8dc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="64" dy="0">Random Forest:</tspan>
+</text>
+<text x="330" y="2914" fill="#e1e8f3" font-family="DejaVu Sans" font-size="17" font-weight="400">
+<tspan x="330" dy="0">τοπικά στατιστικά κόμβων/διαστημάτων τιμών/κλάσεων → συνδυασμός ανά κόμβο → βέλτιστα splits → ένα δάσος 80 δέντρων</tspan>
+</text>
+</g>
+<g id="principle-1">
+<rect x="40" y="3050" width="840" height="106" rx="12" fill="#122238" stroke="#33465f"/>
+<text x="60" y="3082" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="60" dy="0">ΧΡΟΝΙΚΟ ΠΑΡΑΘΥΡΟ ≠ PARTITION</tspan>
+</text>
+<text x="60" y="3113" fill="#b9c8da" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="60" dy="0">χρονικό διάστημα μετρήσεων | τμήμα δεδομένων/εργασίας Spark</tspan>
+</text>
+</g>
+<g id="principle-2">
+<rect x="920" y="3050" width="840" height="106" rx="12" fill="#122238" stroke="#33465f"/>
+<text x="940" y="3082" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="940" dy="0">DATAFRAME ≠ ΠΙΝΑΚΑΣ ΣΤΗ RAM ΤΗΣ PYTHON</tspan>
+</text>
+<text x="940" y="3113" fill="#b9c8da" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="940" dy="0">σχήμα και lazy σχέδιο/αναφορά | τοπικά ή κατανεμημένα δεδομένα</tspan>
+</text>
+</g>
+<g id="principle-3">
+<rect x="40" y="3176" width="840" height="106" rx="12" fill="#122238" stroke="#33465f"/>
+<text x="60" y="3208" fill="#f8fafc" font-family="DejaVu Sans" font-size="17" font-weight="700">
+<tspan x="60" dy="0">PIPELINE ≠ PIPELINEMODEL</tspan>
+</text>
+<text x="60" y="3239" fill="#b9c8da" font-family="DejaVu Sans" font-size="15" font-weight="400">
+<tspan x="60" dy="0">ορισμός σταδίων | στάδια προσαρμοσμένα στα δεδομένα εκπαίδευσης</tspan>
+</text>
+</g>
+<text x="40" y="3356" fill="#8198b1" font-family="DejaVu Sans" font-size="13" font-weight="400">
+<tspan x="40" dy="0">HAR / WISDM · Λογική σημασία πάνω· φυσική συνεργασία κάτω · Παράθυρο ≠ partition · Ένα εκπαιδευμένο μοντέλο, όχι ένα ανά worker</tspan>
+</text>
+</svg>

@@ -1,0 +1,47 @@
+# Main measured experiment: watch accelerometer + gyroscope, 10-second windows.
+# This configuration produced the subject-independent results highlighted in the
+# README, report, presentations, and Cloud comparison.  The local CLI consumes
+# it for both reusable Parquet preparation and the two-model training workflow.
+
+# Reproducibility identity shared by subject splitting and Random Forest.
+project:
+  name: har-spark-cloud-watch-fused-10s
+  seed: 42
+
+# Local Spark resources; the recorded managed-cloud job has separate launch settings.
+spark:
+  app_name: WISDM-HAR-Watch-Fused-10s
+  master: "local[6]"
+  shuffle_partitions: 8
+  driver_memory: "4g"
+
+# Watch sensor files become one fused 36-feature row per complete time window.
+data:
+  raw_glob: "data/raw/wisdm-dataset/raw/watch/*/*.txt"
+  device: watch
+  sensors: [accel, gyro]
+  window_seconds: 10
+  minimum_samples_per_window: 150
+  expected_sampling_hz: 20
+  processed_path: "data/processed/watch_accel_gyro_10s.parquet"
+
+# Fractions apply to whole participants to prevent identity leakage.
+split:
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+
+# Fixed Logistic Regression and Random Forest settings used in the report.
+models:
+  logistic_regression:
+    max_iter: 80
+    reg_param: 0.05
+    elastic_net_param: 0.0
+  random_forest:
+    num_trees: 80
+    max_depth: 12
+    feature_subset_strategy: sqrt
+
+# Every run creates a new UTC-timestamped child under `results`.
+output:
+  results_root: results

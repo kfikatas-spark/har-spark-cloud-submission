@@ -1,0 +1,13 @@
+{
+  "state": "SUCCEEDED",
+  "elapsed": "44m 47s",
+  "usage": "13.38 DCU-h",
+  "batch_id": "har-watch-10s-20260827-055742",
+  "run_id": "cloud-watch-10s-20260827-055742",
+  "runtime": "2.3.39",
+  "region": "europe-west1",
+  "cloud_logistic_accuracy": 0.4995980707395498,
+  "cloud_logistic_macro_f1": 0.4847739151074252,
+  "cloud_random_forest_accuracy": 0.6153536977491961,
+  "cloud_random_forest_macro_f1": 0.6109370721389816
+}

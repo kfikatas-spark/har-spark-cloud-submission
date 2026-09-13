@@ -1,0 +1,16 @@
+{
+  "activities": 18,
+  "feature_windows": 15910,
+  "prepared_feature_path": "data/processed/watch_accel_gyro_10s.parquet",
+  "split_subjects": {
+    "test": 8,
+    "train": 35,
+    "validation": 8
+  },
+  "split_windows": {
+    "test": 2488,
+    "train": 10894,
+    "validation": 2528
+  },
+  "subjects": 51
+}

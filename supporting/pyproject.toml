@@ -1,0 +1,53 @@
+# Packaging and tool configuration for the HAR Spark Cloud project.
+# Installing this project exposes `har-spark` from `src/har_spark/cli.py`.
+# Runtime dependencies support Spark processing and plot/YAML handling; optional
+# groups add development checks and offline presentation generation.
+
+# PEP 517 build backend used for editable and distributable installations.
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# Package identity and runtime compatibility. Python 3.11 matches the project VM.
+[project]
+name = "har-spark-cloud"
+version = "0.1.0"
+description = "Leakage-safe human activity recognition with PySpark MLlib"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "matplotlib>=3.8,<4",
+  "pyspark==3.5.3",
+  "PyYAML>=6.0,<7",
+]
+
+# Tests/linting are not required by the production pipeline.
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "ruff>=0.9,<1",
+]
+docs = [
+  "python-pptx>=1.0,<2",
+]
+
+# Console command that routes users into the validated YAML-driven workflow.
+[project.scripts]
+har-spark = "har_spark.cli:main"
+
+# The import package lives under `src/`, avoiding accidental root-directory imports.
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Shared local/CI test discovery settings.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+# Formatting assumptions used when checking every project Python file.
+[tool.ruff]
+line-length = 100
+target-version = "py311"

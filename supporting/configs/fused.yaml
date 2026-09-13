@@ -1,0 +1,47 @@
+# Phone sensor-fusion experiment using five-second windows.
+# The wildcard reads phone accelerometer and gyroscope files.  Feature extraction
+# runs per sensor, then `features.fuse_sensor_features` inner-joins matching
+# subject/activity/window keys to create a stable 36-feature model row.
+
+# Reproducibility identity shared by subject splitting and Random Forest.
+project:
+  name: har-spark-cloud-fused
+  seed: 42
+
+# Local Spark resources for preprocessing and both model fits.
+spark:
+  app_name: WISDM-HAR-Fused
+  master: "local[6]"
+  shuffle_partitions: 8
+  driver_memory: "4g"
+
+# `sensors` enables fusion; both sensors must exist for a window to survive.
+data:
+  raw_glob: "data/raw/wisdm-dataset/raw/phone/*/*.txt"
+  device: phone
+  sensors: [accel, gyro]
+  window_seconds: 5
+  minimum_samples_per_window: 70
+  expected_sampling_hz: 20
+  processed_path: "data/processed/phone_accel_gyro_5s.parquet"
+
+# Fractions apply to deterministic whole-participant assignments.
+split:
+  train_fraction: 0.70
+  validation_fraction: 0.15
+  test_fraction: 0.15
+
+# Identical settings across configurations isolate the data/window comparison.
+models:
+  logistic_regression:
+    max_iter: 80
+    reg_param: 0.05
+    elastic_net_param: 0.0
+  random_forest:
+    num_trees: 80
+    max_depth: 12
+    feature_subset_strategy: sqrt
+
+# Each run is written to a new timestamped directory.
+output:
+  results_root: results

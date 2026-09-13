@@ -1,0 +1,16 @@
+{
+  "activities": 18,
+  "feature_windows": 32369,
+  "prepared_feature_path": "data/processed/phone_accel_gyro_5s.parquet",
+  "split_subjects": {
+    "test": 8,
+    "train": 35,
+    "validation": 8
+  },
+  "split_windows": {
+    "test": 5102,
+    "train": 22151,
+    "validation": 5116
+  },
+  "subjects": 51
+}
